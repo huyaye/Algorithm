@@ -1,9 +1,11 @@
 
 public class Sort {
-	private static int[] input = { 6, 40, 32, 60, 1, 100, 89, 41, 57, 23 };
+	private static int[] input = { 6, 40, 32, 60, 1, 100, 89, 41, 57, 23, 1 };
+//	private static int[] input = { 6 };
 
 	public static void main(String[] args) {
-		selectionSort(input.length);
+//		selectionSort(input.length);
+		insertionSort(input.length);
 
 		System.out.print("sort result : [ ");
 		System.out.print(input[0]);
@@ -29,8 +31,18 @@ public class Sort {
 		}
 	}
 	
-	private static void insertSort()  {
-		
+	private static void insertionSort(int N)  {
+		for (int i = 1; i < N; i++) {
+			int insertionValue = input[i];
+			for (int j = i - 1; j >= 0; j--) {
+				if (insertionValue > input[j]) {
+					break;
+				} else {
+					input[j+1] = input[j];
+					input[j] = insertionValue;
+				}
+			}
+		}
 	}
 
 }
