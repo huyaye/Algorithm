@@ -1,3 +1,7 @@
+/*
+ * http://www.jungol.co.kr/bbs/board.php?bo_table=pbank&wr_id=1023&sca=3050
+ */
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
