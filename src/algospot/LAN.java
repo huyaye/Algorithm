@@ -18,7 +18,7 @@ public class LAN {
 	static int N; // 건물의 수
 	static int M; // 이미 설치된 케이블의 수
 	static List<Point> Points;
-	static List<Edge> LinkedEdges;
+	static boolean[][] linkedMap;
 	static List<Edge> Edges;
 	static DisJointSet disJointSet;
 	
@@ -39,11 +39,21 @@ public class LAN {
 	private static class Edge implements Comparable<Edge> {
 		Point p1, p2;
 		double distance;
+		boolean isAlreadySet;
 
 		Edge(Point p1, Point p2) {
+			this(p1, p2, false);
+		}
+		
+		Edge(Point p1, Point p2, boolean isAlreadySet) {
 			this.p1 = p1;
 			this.p2 = p2;
-			this.distance = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
+			this.isAlreadySet = isAlreadySet;
+			if (isAlreadySet) {
+				this.distance = 0.0;
+			} else {
+				this.distance = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
+			}
 		}
 
 		@Override
@@ -57,7 +67,7 @@ public class LAN {
 		}
 
 		private double getDistance() {
-			return Math.sqrt(distance);
+			return isAlreadySet ? 0.0 : Math.sqrt(distance);
 		}
 		
 		@Override
@@ -123,10 +133,10 @@ public class LAN {
 			N = sc.nextInt();
 			M = sc.nextInt();
 			Points = new ArrayList<Point>();
-			LinkedEdges = new ArrayList<Edge>();
+			linkedMap = new boolean[N][N];
 			Edges = new ArrayList<Edge>();
 
-			// Point 구성 
+			// 기지 좌표 구성 
 			int[] X = new int[N];
 			for (int i = 0; i < N; i++) {
 				X[i] = sc.nextInt();
@@ -134,25 +144,27 @@ public class LAN {
 			for (int i = 0; i < N; i++) {
 				Points.add(new Point(X[i], sc.nextInt()));
 			}
-			// 이미 연결되어 있는 Edge 구성
+			// 이미 연결되어 있는 기지 표시
 			for (int i = 0; i < M; i++) {
-				Point p1 = Points.get(sc.nextInt());
-				Point p2 = Points.get(sc.nextInt());
-				Edges.add(new Edge(p1, p2));
+				linkedMap[sc.nextInt()][sc.nextInt()] = true;
 			}
-			disJointSet = new DisJointSet();
-			// 이미 연결된 케이블로 DisJointSet 초기화
-			makePath();
 			// Edge 리스트 만들기
-			Edges.clear();
 			for (int i = 0; i < Points.size(); i++) {
 				for (int j = i + 1; j < Points.size(); j++) {
-					Edges.add(new Edge(Points.get(i), Points.get(j)));
+					Point p1 = Points.get(i);
+					Point p2 = Points.get(j);
+					if (linkedMap[i][j] || linkedMap[j][i]) {
+						// 이미 연결되어 있는 기지간 거리는 0으로 설정.
+						Edges.add(new Edge(p1, p2, true));
+					} else {
+						Edges.add(new Edge(p1, p2));
+					}
 				}
 			}
 			// 거리 오름차순으로 Edge 리스트 정렬  
-			Collections.sort(Edges);
+			Collections.sort(Edges);	
 			// 필요한 최소 케이블 길이 구하기
+			disJointSet = new DisJointSet();
 			double ret = makePath();
 			System.out.println(ret);
 		}
