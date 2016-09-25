@@ -37,12 +37,15 @@ public class LAN {
 	}
 
 	private static class Edge implements Comparable<Edge> {
+		int p1_, p2_;
 		Point p1, p2;
 		double distance;
 
-		Edge(Point p1, Point p2) {
-			this.p1 = p1;
-			this.p2 = p2;
+		Edge(int p1_, int p2_) {
+			this.p1_ = p1_;
+			this.p2_ = p2_;
+			this.p1 = Points.get(p1_);
+			this. p2 = Points.get(p2_);
 			this.distance = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
 		}
 
@@ -67,37 +70,37 @@ public class LAN {
 	}
 
 	private static class DisJointSet {
-		List<Set<Point>> setList = new ArrayList<Set<Point>>();
-
-		public void merge(Point p1, Point p2) {
-			Set<Point> set1 = find(p1);
-			Set<Point> set2 = find(p2);
-			if (set1.isEmpty()) {
-				set1.add(p1);
-				setList.add(set1);
+		int[] parent;
+		
+		DisJointSet(int n) {
+			parent = new int[n];
+			for (int i = 0; i < n; i++) {
+				parent[i] = i;
 			}
-			if (set2.isEmpty()) {
-				set2.add(p2);
-			}
-			set1.addAll(set2);
-			setList.remove(set2);
 		}
 
-		public Set<Point> find(Point p) {
-			for (int i = 0; i < setList.size(); i++) {
-				if (setList.get(i) != null && setList.get(i).contains(p)) {
-					return setList.get(i);
-				}
+		public int find(int p) {
+			if (p == parent[p]) {
+				return p;
 			}
-			return new HashSet<Point>();
+			return find(parent[p]);
+		}
+
+		public void merge(int p1, int p2) {
+			p1 = find(p1);
+			p2 = find(p2);
+			if (p1 == p2) {
+				return;
+			}
+			parent[p1] = p2;
 		}
 	}
 
 	private static double makePath() {
 		double ret = 0.0;
 		for (int i = 0; i < Edges.size(); i++) {
-			Point p1 = Edges.get(i).p1;
-			Point p2 = Edges.get(i).p2;
+			int p1 = Edges.get(i).p1_;
+			int p2 = Edges.get(i).p2_;
 			/*
 			 * 사이클 검사
 			 */
@@ -139,18 +142,16 @@ public class LAN {
 				int p1 = sc.nextInt();
 				int p2 = sc.nextInt();
 				linkedMap[p1][p2] = true;
-				Edges.add(new Edge(Points.get(p1), Points.get(p2)));
+				Edges.add(new Edge(p1, p2));
 			}
-			disJointSet = new DisJointSet();
+			disJointSet = new DisJointSet(N);
 			makePath();
 			Edges.clear();
 			// Edge 리스트 만들기
 			for (int i = 0; i < Points.size(); i++) {
 				for (int j = i + 1; j < Points.size(); j++) {
-					Point p1 = Points.get(i);
-					Point p2 = Points.get(j);
 					if ((linkedMap[i][j] || linkedMap[j][i]) == false) {
-						Edges.add(new Edge(p1, p2));
+						Edges.add(new Edge(i, j));
 					}
 				}
 			}
