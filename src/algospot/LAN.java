@@ -39,21 +39,11 @@ public class LAN {
 	private static class Edge implements Comparable<Edge> {
 		Point p1, p2;
 		double distance;
-		boolean isAlreadySet;
 
 		Edge(Point p1, Point p2) {
-			this(p1, p2, false);
-		}
-		
-		Edge(Point p1, Point p2, boolean isAlreadySet) {
 			this.p1 = p1;
 			this.p2 = p2;
-			this.isAlreadySet = isAlreadySet;
-			if (isAlreadySet) {
-				this.distance = 0.0;
-			} else {
-				this.distance = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
-			}
+			this.distance = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
 		}
 
 		@Override
@@ -67,7 +57,7 @@ public class LAN {
 		}
 
 		private double getDistance() {
-			return isAlreadySet ? 0.0 : Math.sqrt(distance);
+			return Math.sqrt(distance);
 		}
 		
 		@Override
@@ -146,17 +136,20 @@ public class LAN {
 			}
 			// 이미 연결되어 있는 기지 표시
 			for (int i = 0; i < M; i++) {
-				linkedMap[sc.nextInt()][sc.nextInt()] = true;
+				int p1 = sc.nextInt();
+				int p2 = sc.nextInt();
+				linkedMap[p1][p2] = true;
+				Edges.add(new Edge(Points.get(p1), Points.get(p2)));
 			}
+			disJointSet = new DisJointSet();
+			makePath();
+			Edges.clear();
 			// Edge 리스트 만들기
 			for (int i = 0; i < Points.size(); i++) {
 				for (int j = i + 1; j < Points.size(); j++) {
 					Point p1 = Points.get(i);
 					Point p2 = Points.get(j);
-					if (linkedMap[i][j] || linkedMap[j][i]) {
-						// 이미 연결되어 있는 기지간 거리는 0으로 설정.
-						Edges.add(new Edge(p1, p2, true));
-					} else {
+					if ((linkedMap[i][j] || linkedMap[j][i]) == false) {
 						Edges.add(new Edge(p1, p2));
 					}
 				}
@@ -164,7 +157,6 @@ public class LAN {
 			// 거리 오름차순으로 Edge 리스트 정렬  
 			Collections.sort(Edges);	
 			// 필요한 최소 케이블 길이 구하기
-			disJointSet = new DisJointSet();
 			double ret = makePath();
 			System.out.println(ret);
 		}
