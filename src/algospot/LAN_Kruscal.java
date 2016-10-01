@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-public class LAN {
+public class LAN_Kruscal {
 	static int C; // 테스트케이스 갯수
 	static int N; // 건물의 수
 	static int M; // 이미 설치된 케이블의 수
@@ -73,7 +73,6 @@ public class LAN {
 			return "Distance : " + getDistance() + ", Point : " + Points.get(p1) + "<->" + Points.get(p2);
 		}
 	}
-
 	private static class DisJointSet {
 		int[] parent;
 
